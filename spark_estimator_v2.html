@@ -1,0 +1,2184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Spark"/>
+<meta name="theme-color" content="#0F0F0F"/>
+<title>Spark Homes Estimator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --spark: #E8501A;
+  --spark-dim: #B83E12;
+  --spark-glow: rgba(232,80,26,0.15);
+  --spark-glow2: rgba(232,80,26,0.08);
+  --ink: #0F0F0F;
+  --ink2: #3D3D3D;
+  --ink3: #7A7A7A;
+  --ink4: #B0B0B0;
+  --line: rgba(255,255,255,0.08);
+  --line2: rgba(255,255,255,0.04);
+  --surface: #161616;
+  --surface2: #1E1E1E;
+  --surface3: #252525;
+  --surface4: #2C2C2C;
+  --white: #FFFFFF;
+  --safe-bottom: max(20px, env(safe-area-inset-bottom));
+  --safe-top: max(0px, env(safe-area-inset-top));
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;}
+html,body{height:100%;overscroll-behavior:none;background:var(--ink);}
+body{margin:0;font-family:'DM Sans',sans-serif;color:var(--white);-webkit-font-smoothing:antialiased;}
+input,button,select,textarea{font-family:'DM Sans',sans-serif;}
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}
+input[type=number]{-moz-appearance:textfield;}
+input:focus,textarea:focus{outline:none;}
+button{cursor:pointer;border:none;background:none;color:inherit;}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);}
+
+/* Scrolling */
+.scroll{overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.scroll-x{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.scroll-x::-webkit-scrollbar{display:none;}
+.no-scroll{overflow:hidden;}
+
+/* Safe areas */
+.pt-safe{padding-top:var(--safe-top);}
+.pb-safe{padding-bottom:var(--safe-bottom);}
+
+/* Layout */
+#root{height:100%;display:flex;flex-direction:column;max-width:600px;margin:0 auto;}
+
+/* ── HEADER ── */
+#header{
+  flex-shrink:0;
+  background:var(--surface);
+  border-bottom:1px solid var(--line);
+  padding-top:var(--safe-top);
+}
+.header-inner{
+  display:flex;align-items:center;gap:12px;
+  padding:14px 16px;
+}
+.menu-btn{
+  width:40px;height:40px;border-radius:12px;
+  background:var(--surface3);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+  transition:background 0.15s;
+}
+.menu-btn:active{background:var(--surface4);}
+.header-center{flex:1;min-width:0;}
+.project-name{
+  font-size:16px;font-weight:700;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  color:var(--white);
+  display:flex;align-items:center;gap:6px;
+}
+.project-name button{
+  color:var(--ink4);padding:0;display:flex;align-items:center;flex-shrink:0;
+}
+.progress-row{display:flex;align-items:center;gap:8px;margin-top:5px;}
+.progress-track{
+  flex:1;height:3px;border-radius:99px;
+  background:var(--surface4);overflow:hidden;
+}
+.progress-fill{
+  height:100%;border-radius:99px;background:var(--spark);
+  transition:width 0.5s cubic-bezier(.4,0,.2,1);
+}
+.progress-pct{font-size:11px;font-weight:600;color:var(--ink3);flex-shrink:0;font-family:'DM Mono',monospace;}
+.deal-btn{
+  flex-shrink:0;
+  padding:8px 12px;border-radius:10px;
+  background:var(--spark-glow2);
+  border:1px solid rgba(232,80,26,0.25);
+  color:var(--spark);font-size:12px;font-weight:600;
+  display:flex;align-items:center;gap:4px;
+  transition:all 0.15s;
+  white-space:nowrap;
+}
+.deal-btn:active{background:var(--spark-glow);}
+
+/* ── ROOM TABS ── */
+#room-tabs{
+  flex-shrink:0;
+  background:var(--surface);
+  border-bottom:1px solid var(--line);
+}
+.tabs-scroll{
+  display:flex;gap:4px;
+  padding:10px 12px;
+  overflow-x:auto;scrollbar-width:none;
+}
+.tabs-scroll::-webkit-scrollbar{display:none;}
+.tab-btn{
+  flex-shrink:0;
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:8px 10px;border-radius:12px;
+  background:transparent;
+  color:var(--ink3);
+  font-size:10px;font-weight:600;
+  min-width:60px;
+  transition:all 0.15s;
+  position:relative;
+}
+.tab-btn.active{
+  background:var(--spark);
+  color:var(--white);
+}
+.tab-btn:not(.active):active{background:var(--surface3);}
+.tab-icon{font-size:18px;line-height:1;}
+.tab-label{
+  max-width:64px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  text-align:center;line-height:1.1;
+}
+.tab-badge{
+  position:absolute;top:4px;right:4px;
+  width:7px;height:7px;border-radius:50%;
+  background:var(--spark);
+  border:1.5px solid var(--surface);
+}
+.tab-btn.active .tab-badge{background:rgba(255,255,255,0.5);border-color:var(--spark);}
+.add-tab-btn{
+  flex-shrink:0;
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:8px 10px;border-radius:12px;
+  border:1.5px dashed var(--surface4);
+  color:var(--ink3);
+  font-size:10px;font-weight:600;
+  min-width:52px;
+  transition:all 0.15s;
+}
+.add-tab-btn:active{border-color:var(--spark);color:var(--spark);}
+
+/* ── MAIN SCROLL ── */
+#main{
+  flex:1;
+  overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding:12px 12px 100px;
+  background:var(--ink);
+}
+
+/* ── ROOM HEADER ── */
+.room-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:12px;padding:0 2px;
+}
+.room-header-left{display:flex;align-items:center;gap:10px;}
+.room-icon-big{
+  width:40px;height:40px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;
+  background:var(--surface2);
+}
+.room-title{font-size:17px;font-weight:700;}
+.room-subtitle{font-size:12px;color:var(--ink3);margin-top:1px;}
+.remove-room-btn{
+  padding:6px 12px;border-radius:8px;
+  background:rgba(239,68,68,0.08);
+  border:1px solid rgba(239,68,68,0.2);
+  color:#F87171;font-size:12px;font-weight:600;
+}
+.remove-room-btn:active{background:rgba(239,68,68,0.15);}
+
+/* ── GROUP CARD ── */
+.group-card{
+  background:var(--surface2);
+  border-radius:16px;
+  margin-bottom:8px;
+  overflow:hidden;
+  border:1px solid var(--line);
+  transition:border-color 0.2s;
+}
+.group-card.has-activity{
+  border-color:rgba(232,80,26,0.3);
+}
+.group-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 16px;
+  cursor:pointer;
+  -webkit-user-select:none;user-select:none;
+}
+.group-header:active{background:var(--surface3);}
+.group-header-left{display:flex;align-items:center;gap:10px;}
+.group-dot{
+  width:8px;height:8px;border-radius:50%;
+  background:var(--surface4);
+  flex-shrink:0;
+  transition:background 0.2s;
+}
+.group-card.has-activity .group-dot{background:var(--spark);}
+.group-name{font-size:14px;font-weight:600;color:var(--white);}
+.no-action-chip{
+  font-size:10px;font-weight:600;
+  padding:2px 7px;border-radius:99px;
+  background:var(--surface4);color:var(--ink3);
+}
+.group-header-right{display:flex;align-items:center;gap:8px;}
+.group-total{
+  font-size:13px;font-weight:700;
+  color:var(--spark);
+  font-family:'DM Mono',monospace;
+}
+.chevron{
+  color:var(--ink4);
+  transition:transform 0.2s cubic-bezier(.4,0,.2,1);
+  flex-shrink:0;
+}
+.chevron.open{transform:rotate(180deg);}
+
+/* ── GROUP BODY ── */
+.group-body{
+  border-top:1px solid var(--line2);
+  overflow:hidden;
+  max-height:0;
+  transition:max-height 0.25s cubic-bezier(0,1,0.5,1);
+}
+.group-body.open{max-height:2000px;}
+
+/* No action toggle */
+.no-action-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 16px;
+  border-bottom:1px solid var(--line2);
+}
+.no-action-label{font-size:13px;color:var(--ink3);font-weight:500;}
+.toggle{
+  width:44px;height:26px;border-radius:99px;
+  background:var(--surface4);
+  position:relative;cursor:pointer;
+  transition:background 0.2s;
+  flex-shrink:0;
+}
+.toggle.on{background:var(--spark);}
+.toggle-thumb{
+  position:absolute;top:3px;left:3px;
+  width:20px;height:20px;border-radius:50%;
+  background:var(--white);
+  box-shadow:0 1px 4px rgba(0,0,0,0.3);
+  transition:transform 0.2s cubic-bezier(.4,0,.2,1);
+}
+.toggle.on .toggle-thumb{transform:translateX(18px);}
+
+/* Line items */
+.line-item{
+  display:flex;align-items:flex-start;gap:12px;
+  padding:12px 16px;
+  border-bottom:1px solid var(--line2);
+  transition:background 0.1s;
+}
+.line-item:last-child{border-bottom:none;}
+.line-item.checked{background:rgba(232,80,26,0.05);}
+.line-item:active{background:var(--surface3);}
+
+.item-check{
+  width:22px;height:22px;border-radius:7px;
+  border:2px solid var(--surface4);
+  background:transparent;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;margin-top:1px;
+  transition:all 0.15s;
+  cursor:pointer;
+}
+.item-check.checked{
+  background:var(--spark);border-color:var(--spark);
+}
+.item-check svg{display:none;}
+.item-check.checked svg{display:block;}
+
+.item-info{flex:1;min-width:0;}
+.item-name{font-size:13px;font-weight:500;color:var(--white);line-height:1.35;}
+.item-price-row{display:flex;align-items:center;gap:6px;margin-top:3px;}
+.item-price-btn{
+  font-size:11px;color:var(--ink3);
+  font-family:'DM Mono',monospace;
+  padding:0;
+  border-bottom:1px dashed transparent;
+  transition:all 0.1s;
+}
+.item-price-btn:hover,.item-price-btn:active{
+  color:var(--spark);border-bottom-color:var(--spark);
+}
+.item-price-btn.overridden{color:var(--spark);}
+.custom-chip{
+  font-size:10px;font-weight:600;padding:1px 6px;
+  border-radius:99px;background:var(--surface4);color:var(--ink3);
+}
+.delete-item-btn{
+  font-size:10px;color:var(--ink4);padding:0;
+  margin-left:auto;
+}
+.delete-item-btn:active{color:#F87171;}
+
+.item-qty-wrap{flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:3px;}
+.qty-input{
+  width:72px;text-align:right;
+  background:var(--surface3);
+  border:1.5px solid var(--surface4);
+  border-radius:10px;
+  color:var(--white);
+  font-size:14px;font-weight:600;
+  padding:6px 8px;
+  font-family:'DM Mono',monospace;
+  transition:border-color 0.15s;
+}
+.qty-input:focus{border-color:var(--spark);}
+.qty-input.active{border-color:rgba(232,80,26,0.5);}
+.line-total{
+  font-size:11px;font-weight:700;
+  color:var(--spark);
+  font-family:'DM Mono',monospace;
+  text-align:right;
+}
+
+/* Add item row */
+.add-item-row{
+  padding:10px 16px;
+  border-top:1px solid var(--line2);
+}
+.add-item-btn{
+  display:flex;align-items:center;gap:6px;
+  color:var(--ink3);font-size:12px;font-weight:600;
+  padding:0;
+  transition:color 0.15s;
+}
+.add-item-btn:active{color:var(--spark);}
+
+/* ── PHOTOS SECTION ── */
+.photos-section{
+  background:var(--surface2);
+  border-radius:16px;
+  overflow:hidden;
+  border:1px solid var(--line);
+  margin-top:4px;
+}
+.photos-header{
+  padding:14px 16px 10px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.photos-title{font-size:13px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:0.06em;}
+.photos-grid{
+  display:flex;flex-wrap:wrap;gap:8px;
+  padding:0 16px 12px;
+}
+.photo-thumb{
+  width:76px;height:76px;border-radius:10px;
+  overflow:hidden;position:relative;
+  cursor:pointer;
+  background:var(--surface3);
+}
+.photo-thumb img{width:100%;height:100%;object-fit:cover;}
+.photo-remove{
+  position:absolute;top:4px;right:4px;
+  width:20px;height:20px;border-radius:50%;
+  background:rgba(0,0,0,0.7);
+  color:var(--white);font-size:11px;
+  display:flex;align-items:center;justify-content:center;
+  backdrop-filter:blur(4px);
+}
+.photo-remove:active{background:rgba(239,68,68,0.8);}
+.photo-ocr{
+  position:absolute;bottom:0;left:0;right:0;
+  background:linear-gradient(transparent,rgba(0,0,0,0.85));
+  padding:14px 4px 4px;
+  font-size:9px;color:var(--white);font-weight:600;
+  text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  font-family:'DM Mono',monospace;
+}
+.photo-ocr.pending{
+  background:rgba(0,0,0,0.5);
+  display:flex;align-items:center;justify-content:center;
+  top:0;padding:0;
+  font-size:8px;color:var(--ink3);
+}
+.add-photo-label{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  width:76px;height:76px;border-radius:10px;
+  border:1.5px dashed var(--surface4);
+  color:var(--ink3);font-size:10px;font-weight:600;
+  gap:4px;cursor:pointer;
+  transition:all 0.15s;
+}
+.add-photo-label:active{border-color:var(--spark);color:var(--spark);}
+
+/* ── BOTTOM BAR ── */
+#bottom-bar{
+  position:fixed;bottom:0;left:0;right:0;
+  background:var(--surface);
+  border-top:1px solid var(--line);
+  padding:12px 16px;
+  padding-bottom:var(--safe-bottom);
+  z-index:30;
+  max-width:600px;
+  left:50%;transform:translateX(-50%);
+  width:100%;
+}
+.bottom-inner{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.total-block{}
+.total-label{font-size:11px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:0.06em;}
+.total-amount{
+  font-size:28px;font-weight:700;
+  color:var(--white);
+  font-family:'DM Mono',monospace;
+  line-height:1.1;
+  transition:all 0.3s cubic-bezier(.34,1.56,.64,1);
+}
+.total-amount .currency{font-size:16px;color:var(--ink3);font-weight:500;}
+.export-btn{
+  display:flex;align-items:center;gap:8px;
+  padding:14px 20px;border-radius:14px;
+  background:var(--spark);
+  color:var(--white);font-size:14px;font-weight:700;
+  transition:all 0.15s;
+  flex-shrink:0;
+}
+.export-btn:active{background:var(--spark-dim);transform:scale(0.97);}
+.export-btn svg{flex-shrink:0;}
+
+/* ── DRAWER ── */
+#drawer-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,0.7);
+  z-index:50;display:none;
+  backdrop-filter:blur(4px);
+}
+#drawer-overlay.open{display:block;}
+#drawer{
+  position:fixed;top:0;left:0;height:100%;width:320px;
+  background:var(--surface);
+  z-index:55;
+  display:flex;flex-direction:column;
+  transform:translateX(-100%);
+  transition:transform 0.3s cubic-bezier(.4,0,.2,1);
+  max-width:85vw;
+  left:50%;margin-left:-300px;
+}
+@media(max-width:600px){#drawer{left:0;margin-left:0;}}
+#drawer.open{transform:translateX(0);}
+.drawer-head{
+  background:var(--surface2);
+  border-bottom:1px solid var(--line);
+  padding-top:var(--safe-top);
+  flex-shrink:0;
+}
+.drawer-head-inner{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px;
+}
+.drawer-title{font-size:18px;font-weight:700;}
+.drawer-close{
+  width:32px;height:32px;border-radius:8px;
+  background:var(--surface4);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--ink3);font-size:16px;
+}
+.drawer-close:active{background:var(--surface3);}
+.drawer-list{flex:1;overflow-y:auto;padding:8px;}
+.drawer-project{
+  padding:14px;border-radius:14px;
+  margin-bottom:4px;
+  cursor:pointer;
+  transition:background 0.15s;
+  border:1.5px solid transparent;
+}
+.drawer-project.active{
+  background:var(--spark-glow2);
+  border-color:rgba(232,80,26,0.25);
+}
+.drawer-project:not(.active):active{background:var(--surface3);}
+.dp-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px;}
+.dp-name{font-size:14px;font-weight:600;color:var(--white);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.dp-total{font-size:13px;font-weight:700;color:var(--spark);font-family:'DM Mono',monospace;flex-shrink:0;}
+.dp-track{height:2px;background:var(--surface4);border-radius:99px;overflow:hidden;margin-bottom:5px;}
+.dp-fill{height:100%;background:var(--spark);border-radius:99px;}
+.dp-meta{font-size:11px;color:var(--ink4);}
+.dp-delete{font-size:11px;color:#F87171;margin-top:6px;padding:0;display:none;}
+.drawer-project.active .dp-delete{display:block;}
+.drawer-footer{
+  padding:12px;border-top:1px solid var(--line);
+  flex-shrink:0;padding-bottom:var(--safe-bottom);
+  display:flex;flex-direction:column;gap:8px;
+}
+.btn-primary{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;padding:14px;border-radius:14px;
+  background:var(--spark);color:var(--white);
+  font-size:14px;font-weight:700;
+  transition:all 0.15s;
+}
+.btn-primary:active{background:var(--spark-dim);}
+.btn-ghost{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;padding:12px;border-radius:14px;
+  background:var(--surface3);color:var(--ink3);
+  font-size:13px;font-weight:600;
+  border:1px solid var(--line);
+  transition:all 0.15s;
+}
+.btn-ghost:active{background:var(--surface4);}
+
+/* ── MODALS ── */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,0.75);
+  z-index:70;display:none;
+  backdrop-filter:blur(6px);
+  align-items:flex-end;
+}
+.modal-overlay.open{display:flex;}
+.modal-sheet{
+  background:var(--surface2);
+  border-radius:24px 24px 0 0;
+  width:100%;
+  max-height:90vh;
+  display:flex;flex-direction:column;
+  animation:slideUp 0.25s cubic-bezier(.4,0,.2,1);
+  max-width:600px;margin:0 auto;
+}
+@keyframes slideUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
+.modal-handle{
+  width:36px;height:4px;border-radius:99px;
+  background:var(--surface4);margin:12px auto 0;flex-shrink:0;
+}
+.modal-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 20px 12px;
+  border-bottom:1px solid var(--line);
+  flex-shrink:0;
+}
+.modal-title{font-size:17px;font-weight:700;}
+.modal-close{
+  width:30px;height:30px;border-radius:8px;
+  background:var(--surface4);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--ink3);font-size:14px;
+}
+.modal-close:active{background:var(--surface3);}
+.modal-body{
+  flex:1;overflow-y:auto;padding:16px 20px;
+  padding-bottom:var(--safe-bottom);
+}
+
+/* Center modal variant */
+.modal-overlay.center{align-items:center;padding:20px;}
+.modal-overlay.center .modal-sheet{
+  border-radius:20px;max-height:auto;
+  animation:fadeScaleIn 0.2s cubic-bezier(.4,0,.2,1);
+}
+@keyframes fadeScaleIn{from{opacity:0;transform:scale(0.95);}to{opacity:1;transform:scale(1);}}
+.modal-overlay.center .modal-handle{display:none;}
+
+/* Form fields */
+.field{margin-bottom:14px;}
+.field-label{font-size:12px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;}
+.field-input{
+  width:100%;background:var(--surface3);
+  border:1.5px solid var(--surface4);
+  border-radius:12px;color:var(--white);
+  font-size:15px;padding:12px 14px;
+  transition:border-color 0.15s;
+}
+.field-input:focus{border-color:var(--spark);}
+.field-input.prefix{padding-left:28px;}
+.field-wrap{position:relative;}
+.field-prefix{
+  position:absolute;left:12px;top:50%;transform:translateY(-50%);
+  color:var(--ink3);font-size:14px;font-weight:600;
+  pointer-events:none;
+}
+.field-row{display:flex;gap:10px;}
+.field-row .field{flex:1;}
+.btn-row{display:flex;gap:8px;margin-top:4px;}
+.btn-row .btn-primary{flex:1;padding:13px;}
+.btn-row .btn-ghost{flex:1;padding:11px;}
+
+/* ── DEAL ANALYZER RESULTS ── */
+.deal-health{
+  padding:16px;border-radius:14px;
+  margin-bottom:12px;
+  border:1px solid;
+}
+.deal-health-label{font-size:18px;font-weight:800;margin-bottom:2px;}
+.deal-health-sub{font-size:13px;}
+.deal-table{background:var(--surface3);border-radius:14px;overflow:hidden;margin-bottom:12px;}
+.deal-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:10px 14px;border-bottom:1px solid var(--line2);
+  font-size:13px;
+}
+.deal-row:last-child{border-bottom:none;}
+.deal-row-label{color:var(--ink3);}
+.deal-row-val{font-weight:700;font-family:'DM Mono',monospace;}
+.deal-mao{
+  background:var(--spark-glow2);
+  border:1px solid rgba(232,80,26,0.3);
+  border-radius:14px;padding:14px;
+}
+.deal-mao-label{font-size:11px;font-weight:700;color:var(--spark);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;}
+.deal-mao-val{font-size:32px;font-weight:800;color:var(--spark);font-family:'DM Mono',monospace;line-height:1;}
+.deal-mao-desc{font-size:11px;color:var(--ink3);margin-top:4px;}
+.deal-warn{
+  margin-top:8px;padding:8px 10px;border-radius:8px;
+  background:rgba(239,68,68,0.1);
+  color:#F87171;font-size:12px;font-weight:600;
+}
+
+/* ── SETTINGS ── */
+.settings-section{margin-bottom:20px;}
+.settings-label{font-size:11px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;}
+.settings-card{
+  background:var(--surface3);border-radius:14px;
+  overflow:hidden;border:1px solid var(--line);
+}
+.settings-row{
+  padding:14px;border-bottom:1px solid var(--line2);
+  font-size:14px;
+}
+.settings-row:last-child{border-bottom:none;}
+.settings-row p{color:var(--ink3);font-size:12px;margin:4px 0 0;}
+.upload-btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  padding:12px;border-radius:12px;
+  background:var(--spark);color:var(--white);
+  font-size:13px;font-weight:700;cursor:pointer;
+  transition:all 0.15s;margin-top:8px;
+}
+.upload-btn:active{background:var(--spark-dim);}
+.price-status{
+  padding:8px 12px;border-radius:8px;
+  font-size:12px;font-weight:600;
+  background:var(--surface4);color:var(--ink3);
+}
+.price-status.custom{background:var(--spark-glow2);color:var(--spark);}
+
+/* ── ROOM MENU ── */
+.room-option{
+  display:flex;align-items:center;gap:12px;
+  padding:14px 16px;border-bottom:1px solid var(--line2);
+  cursor:pointer;transition:background 0.1s;
+}
+.room-option:last-child{border-bottom:none;}
+.room-option:active{background:var(--surface3);}
+.room-option-icon{font-size:22px;width:36px;text-align:center;}
+.room-option-name{font-size:15px;font-weight:600;}
+.room-option-desc{font-size:12px;color:var(--ink3);margin-top:1px;}
+
+/* ── PHOTO VIEWER ── */
+#photo-viewer{
+  position:fixed;inset:0;background:rgba(0,0,0,0.95);
+  z-index:80;display:none;
+  flex-direction:column;
+}
+#photo-viewer.open{display:flex;}
+.pv-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 16px;padding-top:calc(14px + var(--safe-top));
+  flex-shrink:0;
+}
+.pv-close{
+  width:36px;height:36px;border-radius:10px;
+  background:rgba(255,255,255,0.1);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--white);font-size:18px;
+}
+.pv-close:active{background:rgba(255,255,255,0.2);}
+.pv-ocr{flex:1;margin-right:12px;font-size:13px;color:var(--white);}
+.pv-ocr span{color:var(--spark);font-weight:600;}
+.pv-img-wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:12px;}
+.pv-img-wrap img{max-width:100%;max-height:100%;border-radius:12px;object-fit:contain;}
+.pv-actions{
+  display:flex;gap:8px;padding:12px 16px;padding-bottom:var(--safe-bottom);
+  flex-shrink:0;border-top:1px solid var(--line);
+}
+
+/* ── TOASTS ── */
+#toast-container{
+  position:fixed;top:calc(var(--safe-top) + 70px);
+  left:50%;transform:translateX(-50%);
+  z-index:100;display:flex;flex-direction:column;gap:8px;
+  pointer-events:none;min-width:200px;
+}
+.toast{
+  background:var(--surface3);color:var(--white);
+  padding:10px 16px;border-radius:12px;
+  font-size:13px;font-weight:600;
+  border:1px solid var(--line);
+  text-align:center;
+  animation:toastIn 0.25s cubic-bezier(.34,1.56,.64,1);
+  box-shadow:0 8px 32px rgba(0,0,0,0.4);
+}
+.toast.success{background:rgba(16,185,129,0.15);border-color:rgba(16,185,129,0.3);color:#6EE7B7;}
+.toast.error{background:rgba(239,68,68,0.12);border-color:rgba(239,68,68,0.25);color:#FCA5A5;}
+@keyframes toastIn{from{opacity:0;transform:translateY(-12px) scale(0.9);}to{opacity:1;transform:translateY(0) scale(1);}}
+
+/* ── EMPTY STATE ── */
+.empty-state{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-height:60vh;text-align:center;padding:32px;
+}
+.empty-icon{font-size:56px;margin-bottom:16px;line-height:1;}
+.empty-title{font-size:22px;font-weight:800;margin-bottom:8px;}
+.empty-sub{font-size:14px;color:var(--ink3);margin-bottom:28px;line-height:1.5;}
+
+/* ── SCOPE SUMMARY ── */
+.scope-section{margin-bottom:16px;}
+.scope-section-title{
+  font-size:11px;font-weight:700;color:var(--ink3);
+  text-transform:uppercase;letter-spacing:0.08em;
+  padding:8px 0 6px;margin-bottom:4px;
+  border-bottom:1px solid var(--line);
+}
+.scope-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:8px 0;border-bottom:1px solid var(--line2);
+  font-size:13px;
+}
+.scope-row:last-child{border-bottom:none;}
+.scope-item-name{color:var(--white);flex:1;}
+.scope-item-detail{color:var(--ink3);margin-left:8px;font-family:'DM Mono',monospace;font-size:11px;}
+.scope-item-total{color:var(--spark);font-weight:700;font-family:'DM Mono',monospace;margin-left:8px;min-width:60px;text-align:right;}
+.scope-grand{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:14px;border-radius:12px;
+  background:var(--spark-glow2);border:1px solid rgba(232,80,26,0.3);
+  margin-top:12px;
+}
+.scope-grand-label{font-size:13px;font-weight:700;color:var(--ink3);}
+.scope-grand-val{font-size:22px;font-weight:800;color:var(--spark);font-family:'DM Mono',monospace;}
+
+/* Swipe hint */
+.swipe-hint{
+  text-align:center;font-size:11px;color:var(--ink4);
+  padding:8px 0 0;
+}
+
+/* Pulse animation for OCR pending */
+@keyframes pulse{0%,100%{opacity:0.5;}50%{opacity:1;}}
+.ocr-pending{animation:pulse 1.2s ease-in-out infinite;}
+
+/* Vibration on check (CSS only — can't do haptics but give visual feedback) */
+@keyframes checkPop{0%{transform:scale(1);}50%{transform:scale(0.85);}100%{transform:scale(1);}}
+.item-check.popping{animation:checkPop 0.15s ease;}
+
+/* ── SCOPE SUMMARY MODAL SHARE BTN ── */
+.share-scope-btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  padding:13px;border-radius:14px;
+  border:1.5px solid rgba(232,80,26,0.4);
+  color:var(--spark);font-size:13px;font-weight:700;
+  margin-top:10px;
+  transition:all 0.15s;
+}
+.share-scope-btn:active{background:var(--spark-glow);}
+</style>
+</head>
+<body>
+
+<!-- Toast container -->
+<div id="toast-container"></div>
+
+<!-- Photo viewer -->
+<div id="photo-viewer">
+  <div class="pv-header">
+    <div class="pv-ocr" id="pv-ocr-text"></div>
+    <button class="pv-close" onclick="closePhotoViewer()">✕</button>
+  </div>
+  <div class="pv-img-wrap"><img id="pv-img" src="" alt=""/></div>
+  <div class="pv-actions">
+    <button class="btn-ghost" style="flex:1" onclick="editPhotoNote(currentPhotoIdx)">Edit Note</button>
+    <button class="btn-ghost" style="flex:1;color:#F87171" onclick="removePhoto(currentPhotoIdx);closePhotoViewer()">Remove</button>
+  </div>
+</div>
+
+<!-- Drawer overlay -->
+<div id="drawer-overlay" onclick="closeDrawer()"></div>
+
+<!-- Project drawer -->
+<div id="drawer">
+  <div class="drawer-head">
+    <div class="drawer-head-inner">
+      <span class="drawer-title">Projects</span>
+      <button class="drawer-close" onclick="closeDrawer()">✕</button>
+    </div>
+  </div>
+  <div class="drawer-list scroll" id="drawer-list"></div>
+  <div class="drawer-footer">
+    <button class="btn-primary" onclick="closeDrawer();promptNewProject()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      New Project
+    </button>
+    <button class="btn-ghost" onclick="closeDrawer();openSettingsModal()">⚙ Settings</button>
+  </div>
+</div>
+
+<!-- Settings modal -->
+<div class="modal-overlay" id="settings-modal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <span class="modal-title">Settings</span>
+      <button class="modal-close" onclick="closeModal('settings-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="settings-section">
+        <div class="settings-label">Global Price Schedule</div>
+        <div class="settings-card">
+          <div class="settings-row">
+            <div class="price-status" id="price-status">Using default prices</div>
+            <label class="upload-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              Upload CSV
+              <input type="file" accept=".csv" class="sr-only" onchange="handlePriceUpload(this)"/>
+            </label>
+            <button id="reset-prices-btn" onclick="resetPrices()" style="display:none;margin-top:8px;padding:10px;border-radius:10px;background:rgba(239,68,68,0.1);color:#F87171;font-size:13px;font-weight:600;width:100%;">Reset to Default Prices</button>
+          </div>
+        </div>
+      </div>
+      <div class="settings-section">
+        <div class="settings-label">Data</div>
+        <div class="settings-card">
+          <div class="settings-row">
+            <button onclick="exportAllData()" style="color:var(--ink3);font-size:13px;font-weight:600;width:100%;text-align:left;">Export all projects (JSON backup)</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Text input modal -->
+<div class="modal-overlay center" id="text-modal">
+  <div class="modal-sheet" style="border-radius:20px">
+    <div class="modal-header" style="border-radius:20px 20px 0 0">
+      <span class="modal-title" id="text-modal-title">Enter name</span>
+      <button class="modal-close" onclick="closeModal('text-modal')">✕</button>
+    </div>
+    <div class="modal-body" style="padding-top:14px">
+      <input id="text-modal-input" type="text" class="field-input" placeholder=""/>
+      <div class="btn-row" style="margin-top:12px">
+        <button class="btn-ghost" onclick="closeModal('text-modal')">Cancel</button>
+        <button class="btn-primary" id="text-modal-confirm">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add item modal -->
+<div class="modal-overlay" id="add-item-modal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <span class="modal-title">Add Line Item</span>
+      <button class="modal-close" onclick="closeModal('add-item-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field">
+        <div class="field-label">Item Name</div>
+        <input id="new-item-name" type="text" class="field-input" placeholder="e.g. Custom Millwork"/>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <div class="field-label">Unit Cost</div>
+          <div class="field-wrap">
+            <span class="field-prefix">$</span>
+            <input id="new-item-cost" type="number" step="0.01" class="field-input prefix" placeholder="0.00"/>
+          </div>
+        </div>
+        <div class="field">
+          <div class="field-label">Unit</div>
+          <input id="new-item-unit" type="text" class="field-input" placeholder="ea."/>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-ghost" onclick="closeModal('add-item-modal')">Cancel</button>
+        <button class="btn-primary" onclick="confirmAddItem()">Add Item</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Price override modal -->
+<div class="modal-overlay center" id="price-modal">
+  <div class="modal-sheet">
+    <div class="modal-header">
+      <div>
+        <span class="modal-title" id="price-modal-title">Edit Price</span>
+        <p style="font-size:12px;color:var(--ink3);margin:2px 0 0" id="price-modal-sub"></p>
+      </div>
+      <button class="modal-close" onclick="closeModal('price-modal')">✕</button>
+    </div>
+    <div class="modal-body" style="padding-top:14px">
+      <div class="field-wrap">
+        <span class="field-prefix">$</span>
+        <input id="price-modal-input" type="number" step="0.01" class="field-input prefix"/>
+      </div>
+      <div class="btn-row" style="margin-top:12px">
+        <button class="btn-ghost" onclick="closeModal('price-modal')">Cancel</button>
+        <button class="btn-primary" id="price-modal-confirm">Update</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Deal analyzer modal -->
+<div class="modal-overlay" id="deal-modal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <span class="modal-title">Deal Analyzer</span>
+      <button class="modal-close" onclick="closeModal('deal-modal')">✕</button>
+    </div>
+    <div class="modal-body" id="deal-modal-body">
+      <p style="font-size:13px;color:var(--ink3);margin:0 0 16px">Enter deal numbers to see if this property pencils out.</p>
+      <div class="field">
+        <div class="field-label">After Repair Value (ARV)</div>
+        <div class="field-wrap">
+          <span class="field-prefix">$</span>
+          <input id="deal-arv" type="number" class="field-input prefix" placeholder="250,000" oninput="calcDeal()"/>
+        </div>
+      </div>
+      <div class="field">
+        <div class="field-label">Purchase Price</div>
+        <div class="field-wrap">
+          <span class="field-prefix">$</span>
+          <input id="deal-purchase" type="number" class="field-input prefix" placeholder="150,000" oninput="calcDeal()"/>
+        </div>
+      </div>
+      <div class="field">
+        <div class="field-label">Est. Holding Costs</div>
+        <div class="field-wrap">
+          <span class="field-prefix">$</span>
+          <input id="deal-holding" type="number" class="field-input prefix" placeholder="5,000" oninput="calcDeal()"/>
+        </div>
+      </div>
+      <div id="deal-results"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Add room modal -->
+<div class="modal-overlay" id="room-modal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <span class="modal-title">Add Room</span>
+      <button class="modal-close" onclick="closeModal('room-modal')">✕</button>
+    </div>
+    <div class="modal-body" style="padding:0">
+      <div id="room-options"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Scope summary modal -->
+<div class="modal-overlay" id="scope-modal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <span class="modal-title">Scope Summary</span>
+      <button class="modal-close" onclick="closeModal('scope-modal')">✕</button>
+    </div>
+    <div class="modal-body" id="scope-modal-body"></div>
+  </div>
+</div>
+
+<!-- Root -->
+<div id="root">
+  <div id="header"></div>
+  <div id="room-tabs"></div>
+  <div id="main" class="scroll"></div>
+  <div id="bottom-bar"></div>
+</div>
+
+<script>
+'use strict';
+// ═══════════════════════════════════════════════════════════════
+// DATA — all 108 items from the official price list
+// ═══════════════════════════════════════════════════════════════
+const DEFAULT_PRICES = {
+  'ig-01':{name:'Refinish Hardwood Floor',cost:2.35,unit:'sqft'},
+  'ig-02':{name:'New Hardwoods 1.5"',cost:10.00,unit:'sqft'},
+  'ig-03':{name:'New Hardwoods 2"',cost:4.75,unit:'sqft'},
+  'ig-04':{name:'Hardwood Splicing',cost:8.40,unit:'sqft'},
+  'ig-05':{name:'Vinyl Plank',cost:2.50,unit:'sqft'},
+  'ig-06':{name:'Carpet',cost:1.90,unit:'sqft'},
+  'ig-07':{name:'Interior Paint — 2 Tone',cost:2.95,unit:'sqft'},
+  'ig-08':{name:'Drywall Repair',cost:900.00,unit:'1,000 sqft'},
+  'ig-09':{name:'Wallpaper Removal',cost:250.00,unit:'room'},
+  'ig-10':{name:'Interior Door — Hollow Slab',cost:125.00,unit:'ea.'},
+  'ig-11':{name:'Interior Door Hardware (Knob + Hinges + Labor)',cost:25.00,unit:'ea.'},
+  'ig-12':{name:'Bifold Door with Framing',cost:400.00,unit:'ea.'},
+  'ig-13':{name:'Interior Door — Pre-hung',cost:200.00,unit:'ea.'},
+  'ig-14':{name:'Front Entry Door',cost:475.00,unit:'ea.'},
+  'ig-15':{name:'Front Entry Door Hardware',cost:80.00,unit:'ea.'},
+  'ig-16':{name:'Exterior Door Hardware',cost:75.00,unit:'handle'},
+  'ig-17':{name:'Exterior Insulated Side Door (Installed)',cost:500.00,unit:'ea.'},
+  'ig-18':{name:'Sliding Glass Door',cost:1025.00,unit:'ea.'},
+  'ig-19':{name:'Trim Out (Casing, Crown, Baseboard)',cost:3.75,unit:'LF'},
+  'ig-20':{name:'MISC / Punch List',cost:2650.00,unit:'flat'},
+  'ig-21':{name:'Finish Out Labor',cost:1350.00,unit:'flat'},
+  'ig-22':{name:'Light Fixtures',cost:70.00,unit:'100 sqft'},
+  'ig-23':{name:'Bedbug Spray / Heat Treat',cost:475.00,unit:'ea.'},
+  'ig-24':{name:'Termite Treatment',cost:650.00,unit:'ea.'},
+  'ig-25':{name:'Demo',cost:1375.00,unit:'variable'},
+  'ig-26':{name:'Haul Off',cost:725.00,unit:'load'},
+  'ig-27':{name:'Final Cleaning',cost:325.00,unit:'flat'},
+  'ig-28':{name:'Staging',cost:0.90,unit:'sqft'},
+  'kt-01':{name:'Hinges and Pulls',cost:275.00,unit:'kitchen'},
+  'kt-02':{name:'Cabinets Uppers',cost:125.00,unit:'LF'},
+  'kt-03':{name:'Cabinets Lowers',cost:150.00,unit:'LF'},
+  'kt-04':{name:'Cabinet Door Faces Only',cost:80.00,unit:'door'},
+  'kt-05':{name:'Cabinets (Labor & Paint)',cost:1100.00,unit:'kitchen'},
+  'kt-06':{name:'Granite + 4" Splash Guard',cost:40.00,unit:'LF'},
+  'kt-07':{name:'Backsplash',cost:725.00,unit:'house'},
+  'kt-08':{name:'Misc Woodwork',cost:500.00,unit:'variable'},
+  'kt-09':{name:'Tile — Large Areas',cost:6.45,unit:'sqft'},
+  'kt-10':{name:'Tile — Small Areas',cost:10.00,unit:'sqft'},
+  'kt-11':{name:'Undermount Kitchen Sink',cost:325.00,unit:'ea.'},
+  'kt-12':{name:'Microwave / Hood',cost:500.00,unit:'ea.'},
+  'kt-13':{name:'Range',cost:725.00,unit:'ea.'},
+  'kt-14':{name:'Wall Oven',cost:1075.00,unit:'ea.'},
+  'kt-15':{name:'Cooktop',cost:550.00,unit:'ea.'},
+  'kt-16':{name:'Dishwasher',cost:575.00,unit:'ea.'},
+  'kt-17':{name:'Fridge',cost:1175.00,unit:'ea.'},
+  'ba-01':{name:'Granite ($/LF)',cost:35.00,unit:'LF'},
+  'ba-02':{name:'New Bottom Vanity',cost:125.00,unit:'LF'},
+  'ba-03':{name:'Home Depot Vanity w/ Sink (18")',cost:225.00,unit:'ea.'},
+  'ba-04':{name:'Toilet',cost:150.00,unit:'ea.'},
+  'ba-05':{name:'Tile — Large Areas',cost:5.80,unit:'sqft'},
+  'ba-06':{name:'Tile — Small Areas',cost:10.00,unit:'sqft'},
+  'ba-07':{name:'Reglaze Tub or Chemical Clean',cost:350.00,unit:'ea.'},
+  'ba-08':{name:'Reglaze Tub + Surround',cost:750.00,unit:'ea.'},
+  'ba-09':{name:'Reglaze Shower',cost:1325.00,unit:'ea.'},
+  'ba-10':{name:'Tiled Shower Tear Out + Tile Install',cost:3100.00,unit:'ea.'},
+  'ba-11':{name:'Tub Tile Surround Tear Out + Tile Install (incl. tub)',cost:2250.00,unit:'ea.'},
+  'ba-12':{name:'Shower Plastic Insert Tear Out + New Insert',cost:825.00,unit:'ea.'},
+  'ba-13':{name:'Tub Tear Out + New Insert & Tub',cost:1575.00,unit:'ea.'},
+  'ba-14':{name:'Undermount Sink',cost:150.00,unit:'ea.'},
+  'ba-15':{name:'Mirror',cost:200.00,unit:'ea.'},
+  'ba-16':{name:'HVL (needed if no window)',cost:275.00,unit:'ea.'},
+  'as-01':{name:'Furnace',cost:3350.00,unit:'ea.'},
+  'as-02':{name:'Condensing Unit',cost:3300.00,unit:'ea.'},
+  'as-03':{name:'Package Unit',cost:4700.00,unit:'ea.'},
+  'as-04':{name:'A-Coil (if no condensing unit)',cost:1625.00,unit:'ea.'},
+  'as-05':{name:'Ducting (if NO HVAC)',cost:3200.00,unit:'ea.'},
+  'as-06':{name:'Duct Cleaning — Floor Vents',cost:550.00,unit:'ea.'},
+  'as-07':{name:'Window Unit Replacement 220',cost:575.00,unit:'ea.'},
+  'as-08':{name:'Hot Water Heater w/ Expansion Tank',cost:1425.00,unit:'ea.'},
+  'as-09':{name:'Hot Water Heater Expansion Tank Only',cost:200.00,unit:'ea.'},
+  'as-10':{name:'Switches / Outlets',cost:1400.00,unit:'house'},
+  'as-11':{name:'Standard Electrical',cost:1650.00,unit:'house'},
+  'as-12':{name:'Subfloor',cost:8.20,unit:'sqft'},
+  'as-13':{name:'Framing',cost:950.00,unit:'variable'},
+  'as-14':{name:'Structural (Pier)',cost:375.00,unit:'pier'},
+  'as-15':{name:'Structural Foam Injection',cost:5.85,unit:'sqft of affected area'},
+  'as-16':{name:'Roof',cost:1100.00,unit:'225 sqft L&M'},
+  'as-17':{name:'Plumbing',cost:1000.00,unit:'variable'},
+  'as-18':{name:'Electrical Panel Swap to 200A',cost:2350.00,unit:'ea.'},
+  'as-19':{name:'Full Electrical Rewire (to Studs)',cost:5.65,unit:'sqft'},
+  'as-20':{name:'Full Electrical Rewire (leaving Drywall)',cost:9.15,unit:'sqft'},
+  'as-21':{name:'Wall Insulation (to Studs)',cost:1.20,unit:'sqft'},
+  'as-22':{name:'Attic Insulation',cost:1225.00,unit:'1,600 sqft house'},
+  'as-23':{name:'New Drywall to Studs (L&M)',cost:5.20,unit:'sqft'},
+  'as-24':{name:'Aluminum Wiring',cost:2450.00,unit:'variable'},
+  'ex-01':{name:'Fence Repair — Chain Link / Wood Gate',cost:225.00,unit:'variable'},
+  'ex-02':{name:'Fence Repair — Chain Link',cost:275.00,unit:'LF'},
+  'ex-03':{name:'Fence Repair — Privacy 6ft',cost:30.00,unit:'LF'},
+  'ex-04':{name:'Landscaping',cost:450.00,unit:'variable'},
+  'ex-05':{name:"Vinyl Siding (10'x10')",cost:300.00,unit:'square'},
+  'ex-06':{name:'Tuck Pointing',cost:225.00,unit:'variable'},
+  'ex-07':{name:'Exterior Paint',cost:2.60,unit:'sqft'},
+  'ex-08':{name:'Exterior Wood Repair',cost:525.00,unit:'variable'},
+  'ex-09':{name:"Siding Repair (10'x10')",cost:975.00,unit:'section'},
+  'ex-10':{name:'Tree Trimming',cost:450.00,unit:'variable'},
+  'ex-11':{name:'Tree Removal (w/o stump)',cost:1450.00,unit:'tree'},
+  'ex-12':{name:'Stump Grinding',cost:250.00,unit:'stump'},
+  'ex-13':{name:'Aluminum Window Paint (Int/Ext)',cost:700.00,unit:'house'},
+  'ex-14':{name:'Windows (3x5 sash)',cost:425.00,unit:'ea.'},
+  'ex-15':{name:'Window Repair — Non-Insulated (6x6+)',cost:35.00,unit:'sf'},
+  'ex-16':{name:'Window Repair — Insulated (6x6+)',cost:40.00,unit:'sf'},
+  'ex-17':{name:'Aluminum Framed Window Pane',cost:100.00,unit:'pane'},
+  'ex-18':{name:'Guttering',cost:4.15,unit:'LF'},
+  'ex-19':{name:'Concrete w/ Demo',cost:200.00,unit:'sqft'},
+  'ex-20':{name:'Mowing (summer, every 2 weeks)',cost:45.00,unit:'mowing'},
+  'ex-21':{name:'Garage Door — 1 Car',cost:975.00,unit:'ea.'},
+  'ex-22':{name:'Garage Door — 2 Car (Installed)',cost:1225.00,unit:'ea.'},
+  'ex-23':{name:'Garage Conversion',cost:8850.00,unit:'ea.'},
+};
+
+// ── ROOM TEMPLATES ──────────────────────────────────────────
+const ROOM_TEMPLATES = {
+  exterior:  { label:'Exterior',            icon:'🌳', multi:false, groups:[
+    {id:'fence',    name:'Fence',              items:['ex-01','ex-02','ex-03']},
+    {id:'siding',   name:'Siding',             items:['ex-05','ex-06','ex-07','ex-08','ex-09']},
+    {id:'windows',  name:'Windows',            items:['ex-13','ex-14','ex-15','ex-16','ex-17','ex-18']},
+    {id:'garage',   name:'Garage',             items:['ex-21','ex-22','ex-23']},
+    {id:'trees',    name:'Trees & Landscape',  items:['ex-04','ex-10','ex-11','ex-12','ex-19','ex-20']},
+  ]},
+  interior:  { label:'Interior / General',  icon:'🏠', multi:false, groups:[
+    {id:'flooring', name:'Flooring',           items:['ig-01','ig-02','ig-03','ig-04','ig-05','ig-06']},
+    {id:'paint',    name:'Paint & Wall Repair',items:['ig-07','ig-08','ig-09','ig-19','ig-22']},
+    {id:'doors',    name:'Doors',              items:['ig-10','ig-11','ig-12','ig-13','ig-14','ig-15','ig-16','ig-17','ig-18']},
+    {id:'pest',     name:'Pest Control',       items:['ig-23','ig-24']},
+    {id:'general',  name:'General / Labor',    items:['ig-20','ig-21','ig-25','ig-26','ig-27','ig-28']},
+  ]},
+  systems:   { label:'Systems & Structure', icon:'⚡', multi:false, groups:[
+    {id:'hvac',      name:'HVAC',               items:['as-01','as-02','as-03','as-04','as-05','as-06','as-07','as-08','as-09']},
+    {id:'electrical',name:'Electrical',         items:['as-10','as-11','as-18','as-19','as-20','as-24']},
+    {id:'structural',name:'Structural',         items:['as-12','as-13','as-14','as-15','as-16','as-17']},
+    {id:'insulation',name:'Insulation & Drywall',items:['as-21','as-22','as-23']},
+  ]},
+  kitchen:   { label:'Kitchen',             icon:'🍳', multi:false, groups:[
+    {id:'cabinets',  name:'Cabinets',           items:['kt-01','kt-02','kt-03','kt-04','kt-05','kt-08']},
+    {id:'counters',  name:'Countertops & Tile', items:['kt-06','kt-07','kt-09','kt-10','kt-11']},
+    {id:'appliances',name:'Appliances',         items:['kt-12','kt-13','kt-14','kt-15','kt-16','kt-17']},
+  ]},
+  bathroom:  { label:'Bathroom',            icon:'🚿', multi:true,  groups:[
+    {id:'vanity',    name:'Vanity & Countertop',items:['ba-01','ba-02','ba-03','ba-04','ba-14','ba-15','ba-16']},
+    {id:'tubshower', name:'Tub & Shower',       items:['ba-07','ba-08','ba-09','ba-10','ba-11','ba-12','ba-13']},
+    {id:'tile',      name:'Tile',               items:['ba-05','ba-06']},
+  ]},
+  bedroom:   { label:'Bedroom',             icon:'🛏', multi:true,  groups:[
+    {id:'flooring',  name:'Flooring',           items:['ig-01','ig-05','ig-06']},
+    {id:'paint',     name:'Paint',              items:['ig-07','ig-08']},
+    {id:'doors',     name:'Doors',              items:['ig-10','ig-11','ig-13']},
+    {id:'closet',    name:'Closet',             items:['ig-12','ig-10']},
+  ]},
+  living:    { label:'Living / Common',     icon:'🛋', multi:true,  groups:[
+    {id:'flooring',  name:'Flooring',           items:['ig-01','ig-05','ig-06']},
+    {id:'paint',     name:'Paint',              items:['ig-07','ig-08','ig-09']},
+    {id:'doors',     name:'Doors',              items:['ig-10','ig-11','ig-18']},
+    {id:'lighting',  name:'Lighting',           items:['ig-22']},
+  ]},
+};
+
+// ═══════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════
+let S = { projects:[], activeId:null, customPrices:{} };
+let activeTab = 0;
+let priceModalCtx = null;
+let addItemCtx = null;
+let currentPhotoIdx = -1;
+let textModalCb = null;
+
+// ═══════════════════════════════════════════════════════════════
+// PERSISTENCE
+// ═══════════════════════════════════════════════════════════════
+function save() { try { localStorage.setItem('spark_v3', JSON.stringify(S)); } catch(e){} }
+function load() {
+  try { const r=localStorage.getItem('spark_v3'); if(r) S=JSON.parse(r); } catch(e){}
+  if(!S.projects) S.projects=[];
+  if(!S.customPrices) S.customPrices={};
+  if(S.projects.length===0) createProject('123 Main St');
+  if(!S.activeId || !S.projects.find(p=>p.id===S.activeId)) S.activeId=S.projects[0]?.id;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════════
+const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const fmt = n => '$'+Math.round(n).toLocaleString('en-US');
+const fmt2 = n => '$'+Number(n).toFixed(2);
+const uid = () => `${Date.now()}_${Math.random().toString(36).slice(2,7)}`;
+
+function toast(msg, type='', dur=2400) {
+  const el=document.createElement('div');
+  el.className='toast'+(type?' '+type:'');
+  el.textContent=msg;
+  document.getElementById('toast-container').appendChild(el);
+  setTimeout(()=>el.remove(), dur);
+}
+
+function vibrate(pat=[10]) {
+  try { navigator.vibrate && navigator.vibrate(pat); } catch(e){}
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PRICE RESOLUTION
+// ═══════════════════════════════════════════════════════════════
+function getDefaultCost(itemId) {
+  if(S.customPrices[itemId]!==undefined) return S.customPrices[itemId];
+  return DEFAULT_PRICES[itemId]?.cost || 0;
+}
+function getItemCost(proj, roomIdx, groupId, itemId) {
+  const key=`${roomIdx}_${groupId}_${itemId}`;
+  if(proj.priceOverrides?.[key]!==undefined) return proj.priceOverrides[key];
+  return getDefaultCost(itemId);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PROJECT / ROOM FACTORIES
+// ═══════════════════════════════════════════════════════════════
+function makeRoom(type, num) {
+  const tmpl=ROOM_TEMPLATES[type];
+  return {
+    id: uid(), type,
+    label: tmpl.multi ? `${tmpl.label} ${num}` : tmpl.label,
+    groups: tmpl.groups.map(g=>({
+      id:g.id, name:g.name, collapsed:false, noAction:false,
+      items: g.items.map(id=>({id, checked:false, qty:''})),
+      customItems:[],
+    }))
+  };
+}
+
+function createProject(name) {
+  const id='proj_'+uid();
+  const p={
+    id, name:name||'New Property',
+    createdAt:Date.now(),
+    rooms:[], photos:[], priceOverrides:{},
+    dealInfo:{arv:'',purchase:'',holding:''}, notes:''
+  };
+  p.rooms.push(makeRoom('exterior',1));
+  p.rooms.push(makeRoom('interior',1));
+  p.rooms.push(makeRoom('systems',1));
+  p.rooms.push(makeRoom('kitchen',1));
+  p.rooms.push(makeRoom('bathroom',1));
+  S.projects.unshift(p);
+  S.activeId=id;
+  save();
+  return p;
+}
+
+function proj() { return S.projects.find(p=>p.id===S.activeId)||S.projects[0]; }
+
+// ═══════════════════════════════════════════════════════════════
+// CALCULATIONS
+// ═══════════════════════════════════════════════════════════════
+function totalForGroup(p, room, gi) {
+  const g=room.groups[gi]; if(g.noAction) return 0;
+  const ri=p.rooms.indexOf(room);
+  let t=0;
+  for(const item of g.items) {
+    if(!item.checked) continue;
+    t+=(parseFloat(item.qty)||0)*getItemCost(p,ri,g.id,item.id);
+  }
+  for(const item of g.customItems||[]) {
+    if(!item.checked) continue;
+    t+=(parseFloat(item.qty)||0)*(parseFloat(item.cost)||0);
+  }
+  return t;
+}
+
+function projectTotal(p) {
+  let t=0;
+  for(const room of p.rooms) for(let gi=0;gi<room.groups.length;gi++) t+=totalForGroup(p,room,gi);
+  return t;
+}
+
+function projectProgress(p) {
+  let done=0,total=0;
+  for(const room of p.rooms) for(const g of room.groups) {
+    total++;
+    if(g.noAction||g.items.some(i=>i.checked)||(g.customItems||[]).some(i=>i.checked)) done++;
+  }
+  return total?Math.round(done/total*100):0;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER — HEADER
+// ═══════════════════════════════════════════════════════════════
+function renderHeader() {
+  const p=proj(); if(!p) return;
+  const total=projectTotal(p), pct=projectProgress(p);
+  document.getElementById('header').innerHTML=`
+  <div class="header-inner">
+    <button class="menu-btn" onclick="openDrawer()" aria-label="Menu">
+      <svg width="18" height="13" viewBox="0 0 18 13" fill="none">
+        <rect y="0" width="18" height="2.2" rx="1.1" fill="white"/>
+        <rect y="5.4" width="13" height="2.2" rx="1.1" fill="white" opacity="0.6"/>
+        <rect y="10.8" width="8" height="2.2" rx="1.1" fill="white" opacity="0.35"/>
+      </svg>
+    </button>
+    <div class="header-center">
+      <div class="project-name">
+        <span id="proj-name-txt">${esc(p.name)}</span>
+        <button onclick="promptRename()" aria-label="Rename">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M11.5 1.5a2.12 2.12 0 013 3L5 14H2v-3L11.5 1.5z"/></svg>
+        </button>
+      </div>
+      <div class="progress-row">
+        <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
+        <span class="progress-pct">${pct}%</span>
+      </div>
+    </div>
+    <button class="deal-btn" onclick="openDealModal()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+      Deal
+    </button>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER — TABS
+// ═══════════════════════════════════════════════════════════════
+function renderTabs() {
+  const p=proj(); if(!p) return;
+  const tabs=p.rooms.map((room,i)=>{
+    const tmpl=ROOM_TEMPLATES[room.type];
+    const hasActivity=room.groups.some(g=>g.noAction||g.items.some(ii=>ii.checked)||(g.customItems||[]).some(ii=>ii.checked));
+    return `<button class="tab-btn${i===activeTab?' active':''}" onclick="setTab(${i})">
+      ${hasActivity&&i!==activeTab?`<div class="tab-badge"></div>`:''}
+      <span class="tab-icon">${tmpl.icon}</span>
+      <span class="tab-label">${esc(room.label)}</span>
+    </button>`;
+  }).join('');
+  document.getElementById('room-tabs').innerHTML=`
+  <div class="tabs-scroll" id="tabs-scroll">
+    ${tabs}
+    <button class="add-tab-btn" onclick="openRoomModal()">
+      <span style="font-size:18px">+</span>
+      <span>Room</span>
+    </button>
+  </div>`;
+  // Scroll active tab into view
+  requestAnimationFrame(()=>{
+    const strip=document.getElementById('tabs-scroll');
+    const active=strip?.children[activeTab];
+    active?.scrollIntoView({inline:'nearest',behavior:'smooth'});
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER — MAIN CONTENT
+// ═══════════════════════════════════════════════════════════════
+function renderMain() {
+  const p=proj(); if(!p){ document.getElementById('main').innerHTML=renderEmpty(); return; }
+  const room=p.rooms[activeTab]; if(!room){ return; }
+  const tmpl=ROOM_TEMPLATES[room.type];
+  const isMulti=tmpl.multi;
+
+  let html=`<div class="room-header">
+    <div class="room-header-left">
+      <div class="room-icon-big">${tmpl.icon}</div>
+      <div>
+        <div class="room-title">${esc(room.label)}</div>
+        <div class="room-subtitle">${room.groups.length} groups · tap to expand</div>
+      </div>
+    </div>
+    ${isMulti?`<button class="remove-room-btn" onclick="removeRoom(${activeTab})">Remove</button>`:''}
+  </div>`;
+
+  for(let gi=0;gi<room.groups.length;gi++) html+=renderGroup(p,room,gi);
+
+  html+=renderPhotosSection(p);
+  document.getElementById('main').innerHTML=html;
+  bindSwipe();
+}
+
+function renderEmpty() {
+  return `<div class="empty-state">
+    <div class="empty-icon">🏠</div>
+    <div class="empty-title">No Projects Yet</div>
+    <div class="empty-sub">Start a new project to begin your walkthrough estimate.</div>
+    <button class="btn-primary" style="padding:14px 32px" onclick="promptNewProject()">+ New Project</button>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER — GROUP
+// ═══════════════════════════════════════════════════════════════
+function renderGroup(p, room, gi) {
+  const g=room.groups[gi];
+  const hasActivity=g.noAction||g.items.some(i=>i.checked)||(g.customItems||[]).some(i=>i.checked);
+  const gTotal=totalForGroup(p,room,gi);
+  const isOpen=!g.collapsed;
+
+  let html=`<div class="group-card${hasActivity?' has-activity':''}">
+    <div class="group-header" onclick="toggleGroup(${p.rooms.indexOf(room)},${gi})">
+      <div class="group-header-left">
+        <div class="group-dot"></div>
+        <span class="group-name">${esc(g.name)}</span>
+        ${g.noAction?`<span class="no-action-chip">No Action</span>`:''}
+      </div>
+      <div class="group-header-right">
+        ${gTotal>0?`<span class="group-total">${fmt(gTotal)}</span>`:''}
+        <svg class="chevron${isOpen?' open':''}" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 15l-6-6-6 6"/></svg>
+      </div>
+    </div>
+    <div class="group-body${isOpen?' open':''}">
+      <div class="no-action-row">
+        <span class="no-action-label">No action needed</span>
+        <div class="toggle${g.noAction?' on':''}" onclick="toggleNoAction(${p.rooms.indexOf(room)},${gi})">
+          <div class="toggle-thumb"></div>
+        </div>
+      </div>`;
+
+  if(!g.noAction) {
+    const ri=p.rooms.indexOf(room);
+    for(let ii=0;ii<g.items.length;ii++) {
+      const item=g.items[ii];
+      const def=DEFAULT_PRICES[item.id];
+      const cost=getItemCost(p,ri,g.id,item.id);
+      const overridden=p.priceOverrides?.[`${ri}_${g.id}_${item.id}`]!==undefined;
+      const lt=(parseFloat(item.qty)||0)*cost;
+      html+=`<div class="line-item${item.checked?' checked':''}">
+        <div class="item-check${item.checked?' checked':''}" onclick="toggleItem(${ri},${gi},${ii},null)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div class="item-info">
+          <div class="item-name">${esc(def?.name||item.id)}</div>
+          <div class="item-price-row">
+            <button class="item-price-btn${overridden?' overridden':''}" onclick="openPriceModal(${ri},${gi},${ii},null)">${fmt2(cost)}/${esc(def?.unit||'')}</button>
+          </div>
+        </div>
+        <div class="item-qty-wrap">
+          <input type="number" class="qty-input${item.checked?' active':''}" value="${esc(item.qty)}" placeholder="Qty" min="0" step="any"
+            oninput="setQty(${ri},${gi},${ii},null,this.value)"
+            onchange="setQty(${ri},${gi},${ii},null,this.value)"/>
+          ${lt>0?`<div class="line-total">${fmt(lt)}</div>`:''}
+        </div>
+      </div>`;
+    }
+    // Custom items
+    for(let ci=0;ci<(g.customItems||[]).length;ci++) {
+      const item=g.customItems[ci];
+      const cost=parseFloat(item.cost)||0;
+      const lt=(parseFloat(item.qty)||0)*cost;
+      html+=`<div class="line-item${item.checked?' checked':''}">
+        <div class="item-check${item.checked?' checked':''}" onclick="toggleItem(${p.rooms.indexOf(room)},${gi},null,${ci})">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div class="item-info">
+          <div class="item-name">${esc(item.name)}</div>
+          <div class="item-price-row">
+            <button class="item-price-btn" onclick="openPriceModal(${p.rooms.indexOf(room)},${gi},null,${ci})">${fmt2(cost)}/${esc(item.unit||'ea.')}</button>
+            <span class="custom-chip">custom</span>
+            <button class="delete-item-btn" onclick="deleteItem(${p.rooms.indexOf(room)},${gi},null,${ci})">✕</button>
+          </div>
+        </div>
+        <div class="item-qty-wrap">
+          <input type="number" class="qty-input${item.checked?' active':''}" value="${esc(item.qty)}" placeholder="Qty" min="0" step="any"
+            oninput="setQty(${p.rooms.indexOf(room)},${gi},null,${ci},this.value)"
+            onchange="setQty(${p.rooms.indexOf(room)},${gi},null,${ci},this.value)"/>
+          ${lt>0?`<div class="line-total">${fmt(lt)}</div>`:''}
+        </div>
+      </div>`;
+    }
+    html+=`<div class="add-item-row">
+      <button class="add-item-btn" onclick="openAddItemModal(${p.rooms.indexOf(room)},'${g.id}',${gi})">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add custom item
+      </button>
+    </div>`;
+  }
+  html+=`</div></div>`;
+  return html;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER — PHOTOS
+// ═══════════════════════════════════════════════════════════════
+function renderPhotosSection(p) {
+  const photos=p.photos||[];
+  let thumbs=photos.map((ph,i)=>`
+    <div class="photo-thumb" onclick="viewPhoto(${i})">
+      <img src="${ph.dataUrl}" alt="photo ${i+1}" loading="lazy"/>
+      <button class="photo-remove" onclick="event.stopPropagation();removePhoto(${i})">✕</button>
+      ${ph.ocrPending
+        ?`<div class="photo-ocr pending"><span class="ocr-pending">Scanning…</span></div>`
+        :ph.ocrText?`<div class="photo-ocr">${esc(ph.ocrText.slice(0,24))}</div>`:''}
+    </div>`).join('');
+
+  return `<div class="photos-section" style="margin-top:8px">
+    <div class="photos-header">
+      <span class="photos-title">📸 Photos (${photos.length})</span>
+      ${photos.length>0?`<button onclick="openScopeModal()" style="font-size:12px;color:var(--spark);font-weight:600;">Scope Summary</button>`:''}
+    </div>
+    <div class="photos-grid">
+      ${thumbs}
+      <label class="add-photo-label">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        <span>Add Photo</span>
+        <input type="file" accept="image/*" capture="environment" multiple class="sr-only" onchange="handlePhotos(this)"/>
+      </label>
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER — BOTTOM BAR
+// ═══════════════════════════════════════════════════════════════
+function renderBottomBar() {
+  const p=proj(); if(!p) return;
+  const total=projectTotal(p);
+  const parts=fmt(total).replace('$','').split(',');
+  document.getElementById('bottom-bar').innerHTML=`
+  <div class="bottom-inner">
+    <div class="total-block">
+      <div class="total-label">Total Estimate</div>
+      <div class="total-amount"><span class="currency">$</span>${Math.round(total).toLocaleString('en-US')}</div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button onclick="openScopeModal()" style="width:44px;height:44px;border-radius:12px;background:var(--surface3);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--ink3)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+      </button>
+      <button class="export-btn" onclick="exportProject()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export ZIP
+      </button>
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// FULL RENDER
+// ═══════════════════════════════════════════════════════════════
+function render() {
+  renderHeader();
+  renderTabs();
+  renderMain();
+  renderBottomBar();
+  renderDrawerList();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DRAWER
+// ═══════════════════════════════════════════════════════════════
+function renderDrawerList() {
+  const el=document.getElementById('drawer-list'); if(!el) return;
+  if(!S.projects.length){el.innerHTML='<p style="padding:20px;color:var(--ink3);font-size:14px">No projects</p>';return;}
+  el.innerHTML=S.projects.map(p=>{
+    const t=projectTotal(p), pct=projectProgress(p), active=p.id===S.activeId;
+    return `<div class="drawer-project${active?' active':''}" onclick="switchProject('${p.id}')">
+      <div class="dp-top">
+        <span class="dp-name">${esc(p.name)}</span>
+        <span class="dp-total">${fmt(t)}</span>
+      </div>
+      <div class="dp-track"><div class="dp-fill" style="width:${pct}%"></div></div>
+      <div class="dp-meta">${new Date(p.createdAt).toLocaleDateString()} · ${pct}% complete</div>
+      <button class="dp-delete" onclick="event.stopPropagation();deleteProject('${p.id}')">Delete project</button>
+    </div>`;
+  }).join('');
+}
+
+function openDrawer(){ document.getElementById('drawer').classList.add('open'); document.getElementById('drawer-overlay').classList.add('open'); }
+function closeDrawer(){ document.getElementById('drawer').classList.remove('open'); document.getElementById('drawer-overlay').classList.remove('open'); }
+
+// ═══════════════════════════════════════════════════════════════
+// MODALS
+// ═══════════════════════════════════════════════════════════════
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+
+function openSettingsModal(){ updatePriceStatus(); openModal('settings-modal'); }
+
+function openTextModal(title, value, placeholder, cb) {
+  textModalCb=cb;
+  document.getElementById('text-modal-title').textContent=title;
+  const inp=document.getElementById('text-modal-input');
+  inp.value=value||''; inp.placeholder=placeholder||'';
+  document.getElementById('text-modal-confirm').onclick=()=>{ closeModal('text-modal'); cb(inp.value); };
+  openModal('text-modal');
+  setTimeout(()=>inp.focus(),250);
+}
+
+function openRoomModal() {
+  const p=proj();
+  const addable=[
+    ['bathroom','Bathroom','Add another full bathroom'],
+    ['bedroom','Bedroom','Add another bedroom'],
+    ['living','Living / Common','Living room, dining room, hallway'],
+    ['kitchen','Kitchen','Add another kitchen'],
+  ];
+  document.getElementById('room-options').innerHTML=addable.map(([type,name,desc])=>`
+    <div class="room-option" onclick="addRoom('${type}');closeModal('room-modal')">
+      <span class="room-option-icon">${ROOM_TEMPLATES[type].icon}</span>
+      <div>
+        <div class="room-option-name">${name}</div>
+        <div class="room-option-desc">${desc}</div>
+      </div>
+    </div>`).join('');
+  openModal('room-modal');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ACTIONS — PROJECTS
+// ═══════════════════════════════════════════════════════════════
+function promptNewProject() {
+  openTextModal('New Project','','Property address or name', name=>{
+    if(!name.trim()) return;
+    createProject(name.trim()); activeTab=0; render();
+  });
+}
+function promptRename() {
+  const p=proj();
+  openTextModal('Rename Project',p.name,'Property name', name=>{
+    if(!name.trim()) return;
+    p.name=name.trim(); save(); render();
+  });
+}
+function switchProject(id){ S.activeId=id; activeTab=0; save(); closeDrawer(); render(); }
+function deleteProject(id) {
+  if(!confirm('Delete this project? Cannot be undone.')) return;
+  S.projects=S.projects.filter(p=>p.id!==id);
+  if(S.activeId===id) S.activeId=S.projects[0]?.id||null;
+  save(); render();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ACTIONS — TABS / ROOMS
+// ═══════════════════════════════════════════════════════════════
+function setTab(i){ activeTab=i; renderTabs(); renderMain(); }
+
+function addRoom(type) {
+  const p=proj();
+  const count=p.rooms.filter(r=>r.type===type).length+1;
+  p.rooms.push(makeRoom(type,count));
+  activeTab=p.rooms.length-1;
+  save(); render();
+}
+
+function removeRoom(idx) {
+  const p=proj();
+  if(p.rooms.length<=1){toast('Cannot remove the only room','error');return;}
+  p.rooms.splice(idx,1);
+  activeTab=Math.max(0,Math.min(activeTab,p.rooms.length-1));
+  save(); render();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ACTIONS — LINE ITEMS
+// ═══════════════════════════════════════════════════════════════
+function toggleGroup(ri,gi) {
+  const p=proj();
+  p.rooms[ri].groups[gi].collapsed=!p.rooms[ri].groups[gi].collapsed;
+  save(); renderMain();
+}
+
+function toggleNoAction(ri,gi) {
+  const p=proj();
+  const g=p.rooms[ri].groups[gi];
+  g.noAction=!g.noAction;
+  vibrate([8]);
+  save(); renderMain(); renderHeader(); renderBottomBar();
+}
+
+function toggleItem(ri,gi,ii,ci) {
+  const p=proj();
+  const g=p.rooms[ri].groups[gi];
+  if(ci!==null&&ci!==undefined) g.customItems[ci].checked=!g.customItems[ci].checked;
+  else g.items[ii].checked=!g.items[ii].checked;
+  vibrate([6]);
+  save();
+  // Fast partial update — just refresh totals without full re-render
+  renderHeader();
+  renderBottomBar();
+  // Update the specific item's visual state
+  const allItems=document.querySelectorAll('.line-item');
+  renderMain(); // full rerender for accuracy
+}
+
+function setQty(ri,gi,ii,ci,val) {
+  const p=proj();
+  const g=p.rooms[ri].groups[gi];
+  if(ci!==null&&ci!==undefined) g.customItems[ci].qty=val;
+  else g.items[ii].qty=val;
+  save();
+  renderHeader();
+  renderBottomBar();
+  // Update line total display inline
+  const lts=document.querySelectorAll('.line-total');
+  // Trigger re-render of just the group header totals
+  const ghRight=document.querySelectorAll('.group-total');
+  ghRight.forEach(el=>{ /* done via renderMain on blur */ });
+  renderMain();
+}
+
+function deleteItem(ri,gi,ii,ci) {
+  const p=proj();
+  const g=p.rooms[ri].groups[gi];
+  if(ci!==null&&ci!==undefined) g.customItems.splice(ci,1);
+  else g.items.splice(ii,1);
+  save(); renderMain(); renderBottomBar();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PRICE OVERRIDES
+// ═══════════════════════════════════════════════════════════════
+function openPriceModal(ri,gi,ii,ci) {
+  const p=proj();
+  const g=p.rooms[ri].groups[gi];
+  let name,cost,key;
+  if(ci!==null&&ci!==undefined){
+    const item=g.customItems[ci]; name=item.name; cost=item.cost;
+    priceModalCtx={ri,gi,ii:null,ci};
+  } else {
+    const item=g.items[ii]; const def=DEFAULT_PRICES[item.id];
+    name=def?.name||item.id;
+    key=`${ri}_${g.id}_${item.id}`;
+    cost=p.priceOverrides?.[key]!==undefined?p.priceOverrides[key]:getDefaultCost(item.id);
+    priceModalCtx={ri,gi,ii,ci:null,key};
+  }
+  document.getElementById('price-modal-title').textContent=name;
+  document.getElementById('price-modal-sub').textContent='Project-level override — only affects this project';
+  document.getElementById('price-modal-input').value=cost;
+  document.getElementById('price-modal-confirm').onclick=confirmPriceModal;
+  openModal('price-modal');
+  setTimeout(()=>document.getElementById('price-modal-input').focus(),250);
+}
+
+function confirmPriceModal() {
+  const val=parseFloat(document.getElementById('price-modal-input').value);
+  if(isNaN(val)){toast('Enter a valid price','error');return;}
+  const p=proj(); const {ri,gi,ii,ci,key}=priceModalCtx;
+  if(ci!==null&&ci!==undefined) p.rooms[ri].groups[gi].customItems[ci].cost=val;
+  else { if(!p.priceOverrides) p.priceOverrides={}; p.priceOverrides[key]=val; }
+  save(); closeModal('price-modal'); renderMain(); renderBottomBar();
+  toast('Price updated ✓','success');
+}
+
+function openAddItemModal(ri,groupId,gi) {
+  addItemCtx={ri,groupId,gi};
+  document.getElementById('new-item-name').value='';
+  document.getElementById('new-item-cost').value='';
+  document.getElementById('new-item-unit').value='ea.';
+  openModal('add-item-modal');
+  setTimeout(()=>document.getElementById('new-item-name').focus(),250);
+}
+
+function confirmAddItem() {
+  const name=document.getElementById('new-item-name').value.trim();
+  const cost=parseFloat(document.getElementById('new-item-cost').value)||0;
+  const unit=document.getElementById('new-item-unit').value.trim()||'ea.';
+  if(!name){document.getElementById('new-item-name').style.borderColor='#F87171';return;}
+  const p=proj(); const {ri,gi}=addItemCtx;
+  if(!p.rooms[ri].groups[gi].customItems) p.rooms[ri].groups[gi].customItems=[];
+  p.rooms[ri].groups[gi].customItems.push({id:'c_'+uid(),name,cost,unit,qty:'',checked:false});
+  save(); closeModal('add-item-modal'); renderMain(); toast('Item added','success');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SETTINGS
+// ═══════════════════════════════════════════════════════════════
+function updatePriceStatus() {
+  const el=document.getElementById('price-status'); if(!el) return;
+  const btn=document.getElementById('reset-prices-btn');
+  const n=Object.keys(S.customPrices).length;
+  if(n>0){
+    el.className='price-status custom';
+    el.textContent=`Custom prices active — ${n} items overridden`;
+    if(btn) btn.style.display='block';
+  } else {
+    el.className='price-status';
+    el.textContent='Using default prices from official price list';
+    if(btn) btn.style.display='none';
+  }
+}
+
+function handlePriceUpload(input) {
+  const file=input.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const lines=e.target.result.split('\n');
+    const hdrs=lines[0].toLowerCase().split(',');
+    const idIdx=hdrs.findIndex(h=>h.trim()==='id');
+    const costIdx=hdrs.findIndex(h=>h.trim()==='cost');
+    if(idIdx<0||costIdx<0){toast('CSV needs id and cost columns','error');return;}
+    let n=0;
+    for(let i=1;i<lines.length;i++){
+      const cols=parseCSV(lines[i]);
+      const id=cols[idIdx]?.trim(); const cost=parseFloat(cols[costIdx]);
+      if(id&&!isNaN(cost)){S.customPrices[id]=cost;n++;}
+    }
+    save(); updatePriceStatus(); toast(`Updated ${n} prices ✓`,'success');
+  };
+  reader.readAsText(file);
+}
+
+function resetPrices(){
+  if(!confirm('Reset all prices to defaults?')) return;
+  S.customPrices={}; save(); updatePriceStatus(); toast('Prices reset','success');
+}
+
+function parseCSV(line){
+  const r=[]; let cur='',inQ=false;
+  for(const ch of line){ if(ch==='"'){inQ=!inQ;} else if(ch===','&&!inQ){r.push(cur);cur='';} else cur+=ch; }
+  r.push(cur); return r;
+}
+
+function exportAllData(){
+  const blob=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download=`spark_backup_${Date.now()}.json`; a.click();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PHOTOS
+// ═══════════════════════════════════════════════════════════════
+function handlePhotos(input) {
+  Array.from(input.files).forEach(file=>{
+    const reader=new FileReader();
+    reader.onload=e=>{
+      const p=proj();
+      const ph={id:'ph_'+uid(),dataUrl:e.target.result,name:file.name,ocrText:null,ocrPending:true};
+      p.photos.push(ph);
+      save(); renderMain();
+      tryOCR(ph,p);
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+async function tryOCR(ph, p) {
+  try {
+    const base64=ph.dataUrl.split(',')[1];
+    const mtype=ph.dataUrl.includes('png')?'image/png':'image/jpeg';
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-6', max_tokens:150,
+        messages:[{role:'user',content:[
+          {type:'image',source:{type:'base64',media_type:mtype,data:base64}},
+          {type:'text',text:'Extract any serial number, model number, or manufacture year visible on equipment in this photo. Reply with ONLY the extracted data (e.g. "SN:A1B2C3 Mfg:2019") or "none" if not found.'}
+        ]}]
+      })
+    });
+    if(res.ok){
+      const d=await res.json();
+      const txt=d.content?.[0]?.text?.trim()||'';
+      ph.ocrText=(txt==='none'||!txt)?null:txt;
+    }
+  } catch(e){}
+  ph.ocrPending=false;
+  save(); renderMain();
+}
+
+function viewPhoto(idx){
+  const p=proj(); const ph=p.photos[idx]; if(!ph) return;
+  currentPhotoIdx=idx;
+  document.getElementById('pv-img').src=ph.dataUrl;
+  document.getElementById('pv-ocr-text').innerHTML=ph.ocrText
+    ?`<span>📋</span> ${esc(ph.ocrText)}`
+    :`<button onclick="editPhotoNote(${idx})" style="color:var(--spark);font-weight:600;font-size:13px">+ Add serial # or note</button>`;
+  document.getElementById('photo-viewer').classList.add('open');
+}
+
+function closePhotoViewer(){ document.getElementById('photo-viewer').classList.remove('open'); }
+
+function editPhotoNote(idx){
+  const p=proj(); const ph=p.photos[idx];
+  closePhotoViewer();
+  openTextModal('Serial # / Note',ph.ocrText||'','e.g. SN A12345',val=>{
+    ph.ocrText=val||null; save(); renderMain();
+  });
+}
+
+function removePhoto(idx){
+  const p=proj(); p.photos.splice(idx,1); save(); renderMain();
+  toast('Photo removed');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DEAL ANALYZER
+// ═══════════════════════════════════════════════════════════════
+function openDealModal(){
+  const p=proj();
+  document.getElementById('deal-arv').value=p.dealInfo?.arv||'';
+  document.getElementById('deal-purchase').value=p.dealInfo?.purchase||'';
+  document.getElementById('deal-holding').value=p.dealInfo?.holding||'';
+  openModal('deal-modal');
+  calcDeal();
+}
+
+function calcDeal(){
+  const p=proj();
+  const arv=parseFloat(document.getElementById('deal-arv').value)||0;
+  const purchase=parseFloat(document.getElementById('deal-purchase').value)||0;
+  const holding=parseFloat(document.getElementById('deal-holding').value)||0;
+  p.dealInfo={arv,purchase,holding}; save();
+  const el=document.getElementById('deal-results'); if(!el) return;
+  if(!arv||!purchase){el.innerHTML='';return;}
+  const repairs=projectTotal(p);
+  const basis=purchase+repairs+holding;
+  const profit=arv-basis;
+  const roi=basis>0?profit/basis*100:0;
+  const margin=arv>0?profit/arv*100:0;
+  const mao=Math.max(0,arv*0.70-repairs-holding);
+  const overMAO=purchase>mao&&mao>0;
+
+  let hColor,hBg,hBorder,hLabel;
+  if(margin>=20){hColor='#6EE7B7';hBg='rgba(16,185,129,0.08)';hBorder='rgba(16,185,129,0.25)';hLabel='Strong Deal 🟢';}
+  else if(margin>=10){hColor='#FCD34D';hBg='rgba(245,158,11,0.08)';hBorder='rgba(245,158,11,0.25)';hLabel='Marginal Deal 🟡';}
+  else{hColor='#FCA5A5';hBg='rgba(239,68,68,0.08)';hBorder='rgba(239,68,68,0.25)';hLabel='Weak Deal 🔴';}
+
+  el.innerHTML=`
+  <div class="deal-health" style="background:${hBg};border-color:${hBorder}">
+    <div class="deal-health-label" style="color:${hColor}">${hLabel}</div>
+    <div class="deal-health-sub" style="color:${hColor};opacity:0.8">${margin.toFixed(1)}% margin · ${roi.toFixed(1)}% ROI</div>
+  </div>
+  <div class="deal-table">
+    <div class="deal-row"><span class="deal-row-label">Purchase Price</span><span class="deal-row-val">${fmt(purchase)}</span></div>
+    <div class="deal-row"><span class="deal-row-label">Repair Estimate</span><span class="deal-row-val" style="color:var(--spark)">${fmt(repairs)}</span></div>
+    <div class="deal-row"><span class="deal-row-label">Holding Costs</span><span class="deal-row-val">${fmt(holding)}</span></div>
+    <div class="deal-row" style="border-top:1px solid var(--line)"><span class="deal-row-label" style="font-weight:700;color:var(--white)">Total Cost Basis</span><span class="deal-row-val" style="color:var(--white)">${fmt(basis)}</span></div>
+    <div class="deal-row"><span class="deal-row-label">After Repair Value</span><span class="deal-row-val">${fmt(arv)}</span></div>
+    <div class="deal-row"><span class="deal-row-label">Projected Profit</span><span class="deal-row-val" style="color:${profit>=0?'#6EE7B7':'#FCA5A5'}">${fmt(profit)}</span></div>
+  </div>
+  <div class="deal-mao">
+    <div class="deal-mao-label">Max Allowable Offer (70% Rule)</div>
+    <div class="deal-mao-val">${fmt(mao)}</div>
+    <div class="deal-mao-desc">ARV × 70% − Repairs − Holding</div>
+    ${overMAO?`<div class="deal-warn">⚠ Purchase price exceeds MAO by ${fmt(purchase-mao)}</div>`:''}
+  </div>
+  <button class="share-scope-btn" onclick="shareDeal()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+    Share Deal Summary
+  </button>`;
+}
+
+function shareDeal(){
+  const p=proj(); const repairs=projectTotal(p);
+  const arv=parseFloat(p.dealInfo?.arv)||0;
+  const purchase=parseFloat(p.dealInfo?.purchase)||0;
+  const holding=parseFloat(p.dealInfo?.holding)||0;
+  const mao=Math.max(0,arv*0.70-repairs-holding);
+  const profit=arv-(purchase+repairs+holding);
+  const txt=`📋 ${p.name}\nARV: ${fmt(arv)}\nPurchase: ${fmt(purchase)}\nRepairs: ${fmt(repairs)}\nHolding: ${fmt(holding)}\nProfit: ${fmt(profit)}\nMAO: ${fmt(mao)}`;
+  navigator.clipboard?.writeText(txt).then(()=>toast('Copied to clipboard ✓','success')).catch(()=>{alert(txt);});
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SCOPE SUMMARY MODAL
+// ═══════════════════════════════════════════════════════════════
+function openScopeModal(){
+  const p=proj();
+  const total=projectTotal(p);
+  let html='';
+  for(const room of p.rooms){
+    const ri=p.rooms.indexOf(room);
+    let roomHasItems=false; let roomRows='';
+    for(const g of room.groups){
+      if(g.noAction){roomRows+=`<div class="scope-row"><span class="scope-item-name">${esc(g.name)}</span><span class="scope-item-detail">No action</span><span class="scope-item-total">—</span></div>`;roomHasItems=true;continue;}
+      for(const item of g.items){
+        if(!item.checked) continue;
+        const def=DEFAULT_PRICES[item.id];
+        const cost=getItemCost(p,ri,g.id,item.id);
+        const qty=parseFloat(item.qty)||0;
+        const lt=qty*cost;
+        roomRows+=`<div class="scope-row">
+          <span class="scope-item-name">${esc(def?.name||item.id)}</span>
+          <span class="scope-item-detail">${qty} ${esc(def?.unit||'')}</span>
+          <span class="scope-item-total">${fmt(lt)}</span>
+        </div>`;
+        roomHasItems=true;
+      }
+      for(const item of g.customItems||[]){
+        if(!item.checked) continue;
+        const qty=parseFloat(item.qty)||0;
+        const lt=qty*(parseFloat(item.cost)||0);
+        roomRows+=`<div class="scope-row">
+          <span class="scope-item-name">${esc(item.name)}</span>
+          <span class="scope-item-detail">${qty} ${esc(item.unit||'ea.')}</span>
+          <span class="scope-item-total">${fmt(lt)}</span>
+        </div>`;
+        roomHasItems=true;
+      }
+    }
+    if(roomHasItems){
+      html+=`<div class="scope-section">
+        <div class="scope-section-title">${ROOM_TEMPLATES[room.type].icon} ${esc(room.label)}</div>
+        ${roomRows}
+      </div>`;
+    }
+  }
+  if(!html) html='<p style="color:var(--ink3);font-size:14px;text-align:center;padding:32px 0">No items checked yet.</p>';
+  html+=`<div class="scope-grand"><span class="scope-grand-label">Total Estimate</span><span class="scope-grand-val">${fmt(total)}</span></div>`;
+  html+=`<button class="share-scope-btn" onclick="shareScopeText()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+    Copy Scope to Clipboard
+  </button>`;
+  document.getElementById('scope-modal-body').innerHTML=html;
+  openModal('scope-modal');
+}
+
+function shareScopeText(){
+  const p=proj(); const total=projectTotal(p);
+  let txt=`SCOPE — ${p.name}\n${'─'.repeat(30)}\n`;
+  for(const room of p.rooms){
+    const ri=p.rooms.indexOf(room);
+    let lines='';
+    for(const g of room.groups){
+      if(g.noAction){lines+=`  ${g.name}: No action\n`;continue;}
+      for(const item of g.items){
+        if(!item.checked) continue;
+        const def=DEFAULT_PRICES[item.id];
+        const cost=getItemCost(p,ri,g.id,item.id);
+        const qty=parseFloat(item.qty)||0;
+        lines+=`  ${def?.name||item.id}: ${qty} ${def?.unit||''} = ${fmt(qty*cost)}\n`;
+      }
+    }
+    if(lines) txt+=`\n${room.label}\n${lines}`;
+  }
+  txt+=`\n${'─'.repeat(30)}\nTOTAL: ${fmt(total)}`;
+  navigator.clipboard?.writeText(txt).then(()=>toast('Copied ✓','success')).catch(()=>alert(txt));
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SWIPE GESTURE (left/right between rooms)
+// ═══════════════════════════════════════════════════════════════
+let swipeStartX=0,swipeStartY=0,swipeLocked=false;
+function bindSwipe(){
+  const el=document.getElementById('main'); if(!el) return;
+  el.addEventListener('touchstart',e=>{
+    swipeStartX=e.touches[0].clientX;
+    swipeStartY=e.touches[0].clientY;
+    swipeLocked=false;
+  },{passive:true});
+  el.addEventListener('touchend',e=>{
+    if(swipeLocked) return;
+    const dx=e.changedTouches[0].clientX-swipeStartX;
+    const dy=e.changedTouches[0].clientY-swipeStartY;
+    if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)*1.5){
+      const p=proj(); if(!p) return;
+      if(dx<0&&activeTab<p.rooms.length-1){vibrate([8]);setTab(activeTab+1);}
+      else if(dx>0&&activeTab>0){vibrate([8]);setTab(activeTab-1);}
+    }
+  },{passive:true});
+  el.addEventListener('touchmove',e=>{
+    if(swipeLocked) return;
+    const dy=Math.abs(e.touches[0].clientY-swipeStartY);
+    if(dy>10) swipeLocked=true;
+  },{passive:true});
+}
+
+// ═══════════════════════════════════════════════════════════════
+// EXPORT
+// ═══════════════════════════════════════════════════════════════
+async function exportProject(){
+  const p=proj(); const total=projectTotal(p);
+  toast('Building export…');
+  try {
+    // ── Excel ──
+    const wb=XLSX.utils.book_new();
+
+    // Summary sheet
+    const sd=[
+      ['SPARK HOMES — REPAIR ESTIMATE'],[''],
+      ['Project:',p.name],
+      ['Date:',new Date().toLocaleDateString()],
+      ['Total Repairs:',total],[''],
+    ];
+    if(p.dealInfo?.arv){
+      const arv=parseFloat(p.dealInfo.arv)||0,purch=parseFloat(p.dealInfo.purchase)||0,hold=parseFloat(p.dealInfo.holding)||0;
+      const mao=Math.max(0,arv*0.70-total-hold);
+      sd.push(['— DEAL ANALYSIS —'],['ARV',arv],['Purchase',purch],['Repairs',total],['Holding',hold],['Total Basis',purch+total+hold],['Profit',arv-(purch+total+hold)],['MAO (70%)',mao]);
+    }
+    const sw=XLSX.utils.aoa_to_sheet(sd);
+    sw['!cols']=[{wch:28},{wch:18}];
+    XLSX.utils.book_append_sheet(wb,sw,'Summary');
+
+    // Line items sheet
+    const rows=[['Room','Group','Item','Unit','Qty','Unit Cost','Line Total']];
+    for(const room of p.rooms){
+      const ri=p.rooms.indexOf(room);
+      for(const g of room.groups){
+        if(g.noAction){rows.push([room.label,g.name,'No Action Needed','','','',0]);continue;}
+        for(const item of g.items){
+          if(!item.checked) continue;
+          const def=DEFAULT_PRICES[item.id];
+          const cost=getItemCost(p,ri,g.id,item.id);
+          const qty=parseFloat(item.qty)||0;
+          rows.push([room.label,g.name,def?.name||item.id,def?.unit||'',qty,cost,qty*cost]);
+        }
+        for(const item of g.customItems||[]){
+          if(!item.checked) continue;
+          const qty=parseFloat(item.qty)||0, cost=parseFloat(item.cost)||0;
+          rows.push([room.label,g.name,item.name,item.unit||'ea.',qty,cost,qty*cost]);
+        }
+      }
+    }
+    rows.push(['','','','','','TOTAL',total]);
+    const dw=XLSX.utils.aoa_to_sheet(rows);
+    dw['!cols']=[{wch:18},{wch:20},{wch:36},{wch:12},{wch:8},{wch:12},{wch:12}];
+    XLSX.utils.book_append_sheet(wb,dw,'Line Items');
+
+    // Photos sheet
+    if(p.photos?.length){
+      const pr=[['#','Filename','Serial / Note']];
+      p.photos.forEach((ph,i)=>pr.push([i+1,ph.name||`photo_${i+1}`,ph.ocrText||'']));
+      const pw=XLSX.utils.aoa_to_sheet(pr); pw['!cols']=[{wch:5},{wch:30},{wch:40}];
+      XLSX.utils.book_append_sheet(wb,pw,'Photos');
+    }
+
+    const xlData=XLSX.write(wb,{type:'array',bookType:'xlsx'});
+
+    // ── ZIP ──
+    const zip=new JSZip();
+    const safe=p.name.replace(/[^a-z0-9]/gi,'_');
+    zip.file(`${safe}_estimate.xlsx`,xlData);
+    if(p.photos?.length){
+      const pf=zip.folder('photos');
+      p.photos.forEach((ph,i)=>{
+        const b64=ph.dataUrl.split(',')[1];
+        const ext=ph.dataUrl.includes('png')?'png':'jpg';
+        const label=ph.ocrText?`_${ph.ocrText.replace(/[^a-z0-9]/gi,'_').slice(0,20)}`:'';
+        pf.file(`photo_${i+1}${label}.${ext}`,b64,{base64:true});
+      });
+    }
+    const blob=await zip.generateAsync({type:'blob'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download=`${safe}_${new Date().toISOString().slice(0,10)}.zip`;
+    a.click();
+    toast('Downloaded ✓','success');
+  } catch(e){
+    toast('Export failed — '+e.message,'error');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PWA
+// ═══════════════════════════════════════════════════════════════
+const SW=`const C='spark-v2';
+self.addEventListener('install',e=>{self.skipWaiting();});
+self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C).map(k=>caches.delete(k)))));self.clients.claim();});
+self.addEventListener('fetch',e=>{if(e.request.method!=='GET')return;e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).then(res=>{const rc=res.clone();caches.open(C).then(c=>c.put(e.request,rc));return res;}).catch(()=>caches.match(e.request))));});`;
+if('serviceWorker' in navigator){
+  const b=new Blob([SW],{type:'text/javascript'});
+  navigator.serviceWorker.register(URL.createObjectURL(b)).catch(()=>{});
+}
+const mf={name:'Spark Homes Estimator',short_name:'Spark',display:'standalone',background_color:'#0F0F0F',theme_color:'#E8501A',icons:[{src:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="20" fill="%23E8501A"/><text y=".9em" font-size="80" x="8">🏠</text></svg>',sizes:'any',type:'image/svg+xml'}]};
+const ml=document.createElement('link');ml.rel='manifest';ml.href='data:application/json,'+encodeURIComponent(JSON.stringify(mf));document.head.appendChild(ml);
+
+// ── keyboard shortcuts for modals ──
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    ['settings-modal','text-modal','add-item-modal','price-modal','deal-modal','room-modal','scope-modal'].forEach(id=>{
+      document.getElementById(id)?.classList.remove('open');
+    });
+    closePhotoViewer();
+  }
+  if(e.key==='Enter'&&document.getElementById('text-modal')?.classList.contains('open')){
+    document.getElementById('text-modal-confirm')?.click();
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════
+load();
+// Load CDN scripts then render
+const scripts=[
+  'https://cdn.tailwindcss.com',
+  'https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js',
+  'https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js'
+];
+let loaded=0;
+scripts.forEach(src=>{
+  const s=document.createElement('script'); s.src=src;
+  s.onload=()=>{ loaded++; if(loaded===scripts.length) render(); };
+  s.onerror=()=>{ loaded++; if(loaded===scripts.length) render(); };
+  document.head.appendChild(s);
+});
+</script>
+</body>
+</html>
